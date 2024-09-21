@@ -210,7 +210,7 @@ function Home() {
             />
           </div>
         </div>
-        <div className="shadow-lg p-4 md:p-6 rounded-lg bg-white w-full md:w-[80%] max-w-4xl">
+        <div className="shadow-lg p-4 md:p-6 rounded-lg bg-white w-full md:w-[80%] max-w-3xl">
           <h2 className="text-lg md:text-xl font-bold mb-4 text-blue-500 text-center">
             Lista de Precios
           </h2>

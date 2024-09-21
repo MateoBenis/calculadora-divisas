@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 const InfoPais = ({ data }) => {
   return (
-    <div className="flex items-center justify-between gap-2 text-sm md:text-base w-full max-w-md">
+    <div className="flex items-center justify-evenly gap-2 text-sm md:text-base w-full max-w-md">
       <div className="flex items-center gap-2">
         <h2 className="font-bold text-blue-600 min-w-[60px]">{data.name}</h2>
         <img
