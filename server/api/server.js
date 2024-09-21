@@ -1,17 +1,17 @@
-const mongoose = require("mongoose");
-const express = require("express");
-const cors = require("cors");
-const session = require("express-session");
+import express from "express";
+import cors from "cors";
+import session from "express-session";
 
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const dotenv = require("dotenv");
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
 
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 // Generate a secure JWT secret
 const JWT_SECRET = crypto.randomBytes(64).toString("hex");
@@ -57,7 +57,7 @@ app.use(
     secret: "clave",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true }, // Cambiar esto si se va a usar HTTPS
+    cookie: { secure: false }, // Cambiar esto si se va a usar HTTPS
   })
 );
 
@@ -199,6 +199,10 @@ app.get("/admin", isAuthenticated, (req, res) => {
   res.send("Bienvenido al panel de control");
 });
 
-app.listen(port, () => {
-  console.log(`API server running on port ${port}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`API server running on port ${port}`);
+  });
+}
+
+export default app;
