@@ -55,7 +55,7 @@ app.use(
     secret: "clave",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // Cambiar esto si se va a usar HTTPS
+    cookie: { secure: true }, // Cambiar esto si se va a usar HTTPS
   })
 );
 
