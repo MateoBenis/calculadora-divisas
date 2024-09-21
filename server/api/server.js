@@ -1,10 +1,12 @@
-import mongoose from "mongoose";
-import express from "express";
-import cors from "cors";
-import session from "express-session";
-import jwt from "jsonwebtoken";
-import crypto from "crypto";
-import dotenv from "dotenv";
+const mongoose = require("mongoose");
+const express = require("express");
+const cors = require("cors");
+const session = require("express-session");
+
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const dotenv = require("dotenv");
+
 dotenv.config();
 
 const app = express();
