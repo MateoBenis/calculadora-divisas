@@ -17,11 +17,12 @@ const port = process.env.PORT || 3001;
 const JWT_SECRET = crypto.randomBytes(64).toString("hex");
 
 const dbURI =
+  process.env.MONGODB_URI ||
   "mongodb+srv://mateobenis05:gzY6kJ0JnXtPAbaZ@exchange.ns2xm.mongodb.net/?retryWrites=true&w=majority&appName=Exchange";
 
 mongoose
 
-  .connect(dbURI)
+  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Conectado a MongoDB"))
   .catch((err) => console.error(err));
 
@@ -57,7 +58,7 @@ app.use(
     secret: "clave",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // Cambiar esto si se va a usar HTTPS
+    cookie: { secure: true }, // Cambiar esto si se va a usar HTTPS
   })
 );
 
@@ -76,7 +77,7 @@ app.get("/", (req, res) => {
   console.log("Server running on port 3001");
 });
 
-app.get("/getCountries", async (req, res) => {
+app.get("/api/getCountries", async (req, res) => {
   try {
     const AllCountries = await Countries.find({});
     res.json(AllCountries);
@@ -85,7 +86,7 @@ app.get("/getCountries", async (req, res) => {
   }
 });
 
-app.put("/updateCountries", async (req, res) => {
+app.put("/api/updateCountries", async (req, res) => {
   try {
     const updates = req.body;
     const bulkOps = updates.map((country) => ({
@@ -102,7 +103,7 @@ app.put("/updateCountries", async (req, res) => {
   }
 });
 
-app.post("/addCountry", async (req, res) => {
+app.post("/api/addCountry", async (req, res) => {
   try {
     const newCountry = new Countries(req.body);
     await newCountry.save();
@@ -114,7 +115,7 @@ app.post("/addCountry", async (req, res) => {
   }
 });
 
-app.put("/disableCountry/:id", async (req, res) => {
+app.put("/api/disableCountry/:id", async (req, res) => {
   try {
     await Countries.findByIdAndUpdate(req.params.id, { enabled: false });
     res.status(200).json({ message: "País deshabilitado exitosamente" });
@@ -123,7 +124,7 @@ app.put("/disableCountry/:id", async (req, res) => {
   }
 });
 
-app.put("/enableCountry/:id", async (req, res) => {
+app.put("/api/enableCountry/:id", async (req, res) => {
   try {
     await Countries.findByIdAndUpdate(req.params.id, { enabled: true });
     res.status(200).json({ message: "País habilitado exitosamente" });
@@ -132,7 +133,7 @@ app.put("/enableCountry/:id", async (req, res) => {
   }
 });
 
-app.get("/getComments", async (req, res) => {
+app.get("/api/getComments", async (req, res) => {
   try {
     const AllComments = await Comments.find();
     res.json(AllComments);
@@ -141,7 +142,7 @@ app.get("/getComments", async (req, res) => {
   }
 });
 
-app.post("/createComment", async (req, res) => {
+app.post("/api/createComment", async (req, res) => {
   try {
     const newComment = new Comments(req.body);
     await newComment.save();
@@ -154,7 +155,7 @@ app.post("/createComment", async (req, res) => {
   }
 });
 
-app.post("/admin/login", async (req, res) => {
+app.post("/api/admin/login", async (req, res) => {
   const { name, password } = req.body;
 
   const admin = await Admin.findOne({ name });
@@ -185,7 +186,7 @@ function isAuthenticated(req, res, next) {
   });
 }
 
-app.delete("/deleteComments", async (req, res) => {
+app.delete("/api/deleteComments", async (req, res) => {
   try {
     const { ids } = req.body; // Expecting an array of comment IDs to delete
     await Comments.deleteMany({ _id: { $in: ids } });
@@ -195,7 +196,7 @@ app.delete("/deleteComments", async (req, res) => {
   }
 });
 
-app.get("/admin", isAuthenticated, (req, res) => {
+app.get("/api/admin", isAuthenticated, (req, res) => {
   res.send("Bienvenido al panel de control");
 });
 

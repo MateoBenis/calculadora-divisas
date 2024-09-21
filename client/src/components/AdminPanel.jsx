@@ -30,7 +30,7 @@ const AdminPanel = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/getCountries")
+      .get("https://server-chi-lyart.vercel.app/api/getCountries")
       .then((response) => setCountries(response.data))
       .catch((error) => console.error("Error fetching countries:", error));
   }, []);
@@ -55,7 +55,10 @@ const AdminPanel = () => {
 
   const handleSaveChanges = async () => {
     try {
-      await axios.put("http://localhost:3001/updateCountries", changes);
+      await axios.put(
+        "https://server-chi-lyart.vercel.app/api/updateCountries",
+        changes
+      );
       setSuccessMessage("Cambios guardados con éxito."); // Set success message
       setTimeout(() => {
         setSuccessMessage(""); // Clear message after 3 seconds
@@ -80,7 +83,7 @@ const AdminPanel = () => {
     try {
       const action = countryToDelete.enabled ? "disable" : "enable";
       await axios.put(
-        `http://localhost:3001/${action}Country/${countryToDelete._id}`
+        `https://server-chi-lyart.vercel.app/api/${action}Country/${countryToDelete._id}`
       );
 
       setCountries((prevCountries) =>
@@ -98,7 +101,7 @@ const AdminPanel = () => {
   const handleAddCountry = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/addCountry",
+        "https://server-chi-lyart.vercel.app/api/addCountry",
         newCountry
       );
       setCountries([...countries, response.data.country]);

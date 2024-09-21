@@ -26,7 +26,7 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/createComment",
+        "https://server-chi-lyart.vercel.app/api/createComment",
         commentToSend
       );
       setComments([...comments, response.data.comment]);

@@ -22,10 +22,13 @@ function AdminLogin() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:3001/admin/login", {
-        name,
-        password,
-      });
+      const response = await axios.post(
+        "https://server-chi-lyart.vercel.app/api/admin/login",
+        {
+          name,
+          password,
+        }
+      );
 
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);

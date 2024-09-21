@@ -33,9 +33,12 @@ function Home() {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axios.delete("http://localhost:3001/deleteComments", {
-        data: { ids: [commentId] },
-      });
+      await axios.delete(
+        "https://server-chi-lyart.vercel.app/api/deleteComments",
+        {
+          data: { ids: [commentId] },
+        }
+      );
       setComments((prevComments) =>
         prevComments.filter((comment) => comment._id !== commentId)
       );
@@ -54,7 +57,9 @@ function Home() {
 
     const fetchCountries = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/getCountries");
+        const response = await axios.get(
+          "https://server-chi-lyart.vercel.app/api/getCountries"
+        );
         const countriesData = response.data.filter(
           (country) =>
             typeof country.usd_price === "number" &&
@@ -69,7 +74,9 @@ function Home() {
 
     const fetchComments = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/getComments");
+        const response = await axios.get(
+          "https://server-chi-lyart.vercel.app/api/getComments"
+        );
         setComments(response.data);
         const savedVisibleComments = JSON.parse(
           localStorage.getItem("visibleComments") || "[]"
