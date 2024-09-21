@@ -1,12 +1,11 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import mongoose from "mongoose";
 import express from "express";
 import cors from "cors";
 import session from "express-session";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 
@@ -15,7 +14,8 @@ const port = 3001;
 // Generate a secure JWT secret
 const JWT_SECRET = crypto.randomBytes(64).toString("hex");
 
-const dbURI = import.meta.env.VITE_DB_URI;
+const dbURI =
+  "mongodb+srv://mateobenis05:gzY6kJ0JnXtPAbaZ@exchange.ns2xm.mongodb.net/?retryWrites=true&w=majority&appName=Exchange";
 
 mongoose
 
@@ -195,5 +195,4 @@ app.get("/admin", isAuthenticated, (req, res) => {
 
 app.listen(port, () => {
   console.log(`API server running on port ${port}`);
-  console.log(dbURI);
 });
