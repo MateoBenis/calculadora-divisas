@@ -68,6 +68,8 @@ app.get("/", (req, res) => {
     "Access-Control-Allow-Methods",
     "PUT, POST, GET, DELETE, PATCH, OPTIONS"
   );
+
+  console.log("Server running on port 3001");
 });
 
 app.get("/getCountries", async (req, res) => {
