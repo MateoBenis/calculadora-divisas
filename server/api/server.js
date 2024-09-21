@@ -69,6 +69,8 @@ app.get("/", (req, res) => {
     "PUT, POST, GET, DELETE, PATCH, OPTIONS"
   );
 
+  res.send("Server running on port 3001");
+
   console.log("Server running on port 3001");
 });
 
