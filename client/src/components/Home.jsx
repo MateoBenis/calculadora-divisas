@@ -120,12 +120,15 @@ function Home() {
 
             {showModal && (
               <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                <div className="bg-white shadow-md rounded-lg p-4 md:p-6">
+                <div className="bg-white shadow-md rounded-lg p-4 md:p-6 max-w-2xl w-full max-h-full overflow-y-auto">
                   <h3 className="font-bold mb-2 text-lg md:text-xl text-gray-800">
                     Seleccionar comentarios visibles:
                   </h3>
                   {comments.map((comment) => (
-                    <div key={comment._id} className="flex items-center mb-2">
+                    <div
+                      key={comment._id}
+                      className="flex items-center mb-2 max-w-full"
+                    >
                       <input
                         type="checkbox"
                         id={comment._id}
@@ -135,11 +138,11 @@ function Home() {
                       />
                       <label
                         htmlFor={comment._id}
-                        className="text-sm md:text-base text-gray-700"
+                        className="text-sm md:text-base text-gray-700 flex-1 overflow-hidden"
                       >
-                        <span className="text-gray-700 italic mb-2 text-sm md:text-base">
+                        <span className="text-gray-700 italic mb-2 text-sm md:text-base break-words overflow-hidden block">
                           &quot;{comment.comment}&quot;
-                        </span>{" "}
+                        </span>
                         -{" "}
                         <span className="font-medium text-gray-700 text-sm md:text-base">
                           {comment.name}
@@ -169,7 +172,7 @@ function Home() {
               </div>
             )}
 
-            <div className="my-8 bg-white shadow-md rounded-lg p-4 md:p-6">
+            <div className="my-8 bg-white shadow-md rounded-lg p-4 md:p-6 max-w-[37.3rem]">
               <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-4">
                 Comentarios de usuarios
               </h3>
@@ -179,9 +182,9 @@ function Home() {
                   .map((comment) => (
                     <div
                       key={comment._id}
-                      className="bg-gray-50 rounded-md p-3 md:p-4"
+                      className="bg-gray-50 rounded-md p-3 md:p-4 max-w-full"
                     >
-                      <p className="text-gray-700 italic mb-2 text-sm md:text-base">
+                      <p className="text-gray-700 italic mb-2 text-sm md:text-base break-words">
                         &quot;{comment.comment}&quot;
                       </p>
                       <p className="text-xs md:text-sm text-gray-500">

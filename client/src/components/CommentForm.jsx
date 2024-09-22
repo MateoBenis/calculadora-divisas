@@ -9,35 +9,24 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
     comment: "",
   });
   const [error, setError] = useState("");
+  const [nameCharsLeft, setNameCharsLeft] = useState(20);
+  const [commentCharsLeft, setCommentCharsLeft] = useState(120);
 
-  // const handleAddComment = async (e) => {
-  //   e.preventDefault();
+  const handleNameChange = (e) => {
+    const name = e.target.value;
+    if (name.length <= 20) {
+      setNewComment({ ...newComment, name });
+      setNameCharsLeft(20 - name.length);
+    }
+  };
 
-  //   // Validation
-  //   if (newComment.comment.trim() === "") {
-  //     setError("El comentario no puede estar vacío.");
-  //     return;
-  //   }
-
-  //   const commentToSend = {
-  //     name: newComment.name.trim() === "" ? "Anónimo" : newComment.name,
-  //     comment: newComment.comment,
-  //   };
-
-  //   try {
-  //     const response = await axios.post(
-  //       "https://server-chi-lyart.vercel.app/api/createComment",
-  //       commentToSend
-  //     );
-  //     setComments([...comments, response.data.comment]);
-  //     setNewComment({ name: "", comment: "" });
-  //     setShowModal(false);
-  //     setError(""); // Clear error on successful submission
-  //   } catch (error) {
-  //     console.error("Error adding comment:", error);
-  //     setError("Hubo un error al agregar el comentario. Inténtalo de nuevo.");
-  //   }
-  // };
+  const handleCommentChange = (e) => {
+    const comment = e.target.value;
+    if (comment.length <= 120) {
+      setNewComment({ ...newComment, comment });
+      setCommentCharsLeft(120 - comment.length);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,6 +34,14 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
     // Validation
     if (newComment.comment.trim() === "") {
       setError("El comentario no puede estar vacío.");
+      return;
+    }
+    if (newComment.name.length > 20) {
+      setError("El nombre no puede tener más de 20 caracteres.");
+      return;
+    }
+    if (newComment.comment.length > 120) {
+      setError("El comentario no puede tener más de 120 caracteres.");
       return;
     }
 
@@ -63,6 +60,8 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
       setNewComment({ name: "", comment: "" });
       setShowModal(false);
       setError(""); // Clear error on successful submission
+      setNameCharsLeft(20); // Reset character count
+      setCommentCharsLeft(120); // Reset character count
     } catch (error) {
       console.error("Error adding comment:", error);
       setError("Hubo un error al agregar el comentario. Inténtalo de nuevo.");
@@ -96,19 +95,21 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
                 type="text"
                 placeholder="Nombre (Opcional)"
                 value={newComment.name}
-                onChange={(e) =>
-                  setNewComment({ ...newComment, name: e.target.value })
-                }
+                onChange={handleNameChange}
                 className="block w-full p-2 md:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-300 focus:border-blue-300 text-gray-700"
               />
+              <p className="text-gray-500 text-sm">
+                {nameCharsLeft} caracteres restantes
+              </p>
               <textarea
                 placeholder="Comentario"
                 value={newComment.comment}
-                onChange={(e) =>
-                  setNewComment({ ...newComment, comment: e.target.value })
-                }
+                onChange={handleCommentChange}
                 className="block w-full p-2 md:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-300 focus:border-blue-300 text-gray-700 h-24 md:h-32 resize-none"
               ></textarea>
+              <p className="text-gray-500 text-sm">
+                {commentCharsLeft} caracteres restantes
+              </p>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <button
                 type="submit"
