@@ -22,13 +22,22 @@ function Home() {
     );
   };
 
-  const saveVisibleComments = () => {
-    setVisibleComments(tempVisibleComments);
-    localStorage.setItem(
-      "visibleComments",
-      JSON.stringify(tempVisibleComments)
-    );
-    setShowModal(false);
+  const saveVisibleComments = async () => {
+    try {
+      const updates = comments.map((comment) => ({
+        ...comment,
+        isVisible: tempVisibleComments.includes(comment._id),
+      }));
+
+      await axios.put(
+        "https://server-chi-lyart.vercel.app/api/updateCommentsVisibility",
+        updates
+      );
+      setVisibleComments(tempVisibleComments);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error updating comment visibility:", error);
+    }
   };
 
   const handleDeleteComment = async (commentId) => {
@@ -78,11 +87,11 @@ function Home() {
           "https://server-chi-lyart.vercel.app/api/getComments"
         );
         setComments(response.data);
-        const savedVisibleComments = JSON.parse(
-          localStorage.getItem("visibleComments") || "[]"
-        );
-        setVisibleComments(savedVisibleComments);
-        setTempVisibleComments(savedVisibleComments);
+        const visibleComments = response.data
+          .filter((comment) => comment.isVisible)
+          .map((comment) => comment._id);
+        setVisibleComments(visibleComments);
+        setTempVisibleComments(visibleComments);
       } catch (error) {
         console.error(error);
       }

@@ -10,7 +10,36 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
   });
   const [error, setError] = useState("");
 
-  const handleAddComment = async (e) => {
+  // const handleAddComment = async (e) => {
+  //   e.preventDefault();
+
+  //   // Validation
+  //   if (newComment.comment.trim() === "") {
+  //     setError("El comentario no puede estar vacío.");
+  //     return;
+  //   }
+
+  //   const commentToSend = {
+  //     name: newComment.name.trim() === "" ? "Anónimo" : newComment.name,
+  //     comment: newComment.comment,
+  //   };
+
+  //   try {
+  //     const response = await axios.post(
+  //       "https://server-chi-lyart.vercel.app/api/createComment",
+  //       commentToSend
+  //     );
+  //     setComments([...comments, response.data.comment]);
+  //     setNewComment({ name: "", comment: "" });
+  //     setShowModal(false);
+  //     setError(""); // Clear error on successful submission
+  //   } catch (error) {
+  //     console.error("Error adding comment:", error);
+  //     setError("Hubo un error al agregar el comentario. Inténtalo de nuevo.");
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validation
@@ -22,6 +51,7 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
     const commentToSend = {
       name: newComment.name.trim() === "" ? "Anónimo" : newComment.name,
       comment: newComment.comment,
+      isVisible: false, // Set isVisible to false by default
     };
 
     try {
@@ -61,7 +91,7 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
             <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-4">
               Agrega comentario
             </h2>
-            <form onSubmit={handleAddComment} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 placeholder="Nombre (Opcional)"

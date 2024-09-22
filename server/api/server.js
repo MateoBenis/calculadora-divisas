@@ -46,6 +46,7 @@ const Admin = mongoose.model("admin", adminSchema);
 const commentSchema = new mongoose.Schema({
   name: String,
   comment: String,
+  isVisible: { type: Boolean, default: false }, // Added isVisible field
 });
 
 const Comments = mongoose.model("comments", commentSchema);
@@ -135,8 +136,8 @@ app.put("/api/enableCountry/:id", async (req, res) => {
 
 app.get("/api/getComments", async (req, res) => {
   try {
-    const AllComments = await Comments.find();
-    res.json(AllComments);
+    const allComments = await Comments.find(); // Return all comments
+    res.json(allComments);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -185,6 +186,26 @@ function isAuthenticated(req, res, next) {
     next();
   });
 }
+app.get("/api/admin", isAuthenticated, (req, res) => {
+  res.send("Bienvenido al panel de control");
+});
+
+app.put("/api/updateCommentsVisibility", async (req, res) => {
+  try {
+    const updates = req.body;
+    const bulkOps = updates.map((comment) => ({
+      updateOne: {
+        filter: { _id: comment._id },
+        update: { $set: { isVisible: comment.isVisible } },
+      },
+    }));
+
+    await Comments.bulkWrite(bulkOps);
+    res.status(200).json({ message: "Comentarios actualizados exitosamente" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 app.delete("/api/deleteComments", async (req, res) => {
   try {
@@ -194,10 +215,6 @@ app.delete("/api/deleteComments", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
-
-app.get("/api/admin", isAuthenticated, (req, res) => {
-  res.send("Bienvenido al panel de control");
 });
 
 if (process.env.NODE_ENV !== "production") {
