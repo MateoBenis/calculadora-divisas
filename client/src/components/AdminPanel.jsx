@@ -9,6 +9,7 @@ const AdminPanel = () => {
   const [changes, setChanges] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showDisableModal, setShowDisableModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // New state for delete modal
   const [countryToDelete, setCountryToDelete] = useState(null);
   const [newCountry, setNewCountry] = useState({
     name: "",
@@ -31,7 +32,12 @@ const AdminPanel = () => {
   useEffect(() => {
     axios
       .get("https://server-chi-lyart.vercel.app/api/getCountries")
-      .then((response) => setCountries(response.data))
+      .then((response) => {
+        const sortedCountries = response.data.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setCountries(sortedCountries);
+      })
       .catch((error) => console.error("Error fetching countries:", error));
   }, []);
 
@@ -104,11 +110,40 @@ const AdminPanel = () => {
         "https://server-chi-lyart.vercel.app/api/addCountry",
         newCountry
       );
-      setCountries([...countries, response.data.country]);
+      const updatedCountries = [...countries, response.data.country].sort(
+        (a, b) => a.name.localeCompare(b.name)
+      );
+      setCountries(updatedCountries);
       setShowModal(false);
       setNewCountry({ name: "", flag: "", currency: "", usd_price: 0 });
     } catch (error) {
       console.error("Error adding country:", error);
+    }
+  };
+
+  const handleDeleteClick = (country) => {
+    setCountryToDelete(country);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteCountry = async () => {
+    if (!countryToDelete._id) {
+      console.error("El ID del país es indefinido");
+      return;
+    }
+
+    try {
+      await axios.delete(
+        `https://server-chi-lyart.vercel.app/api/deleteCountry/${countryToDelete._id}`
+      );
+
+      setCountries((prevCountries) =>
+        prevCountries.filter((c) => c._id !== countryToDelete._id)
+      );
+
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error(`Error deleting country:`, error);
     }
   };
 
@@ -162,6 +197,9 @@ const AdminPanel = () => {
                   Nombre
                 </th>
                 <th className="px-2 md:px-4 py-2 md:py-3 text-left text-blue-700">
+                  Bandera (URL)
+                </th>
+                <th className="px-2 md:px-4 py-2 md:py-3 text-left text-blue-700">
                   Moneda
                 </th>
                 <th className="px-2 md:px-4 py-2 md:py-3 text-left text-blue-700">
@@ -183,7 +221,7 @@ const AdminPanel = () => {
                   <td className="px-2 md:px-4 py-2 md:py-3">
                     <input
                       type="text"
-                      value={country.name}
+                      value={country.name || ""}
                       onChange={(e) =>
                         handleInputChange(country._id, "name", e.target.value)
                       }
@@ -194,7 +232,18 @@ const AdminPanel = () => {
                   <td className="px-2 md:px-4 py-2 md:py-3">
                     <input
                       type="text"
-                      value={country.currency}
+                      value={country.flag || ""}
+                      onChange={(e) =>
+                        handleInputChange(country._id, "flag", e.target.value)
+                      }
+                      disabled={!country.enabled}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                    />
+                  </td>
+                  <td className="px-2 md:px-4 py-2 md:py-3">
+                    <input
+                      type="text"
+                      value={country.currency || ""}
                       onChange={(e) =>
                         handleInputChange(
                           country._id,
@@ -209,7 +258,7 @@ const AdminPanel = () => {
                   <td className="px-2 md:px-4 py-2 md:py-3">
                     <input
                       type="number"
-                      value={country.usd_price}
+                      value={country.usd_price || 0}
                       onChange={(e) =>
                         handleInputChange(
                           country._id,
@@ -221,12 +270,18 @@ const AdminPanel = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
                     />
                   </td>
-                  <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                  <td className="px-2 md:px-4 py-2 md:py-3 text-center flex flex-row">
                     <button
                       onClick={() => handleDisableClick(country)}
                       className="px-2 md:px-4 py-1 md:py-2 bg-red-200 text-red-700 rounded-lg hover:bg-red-300 transition-colors text-xs md:text-sm"
                     >
                       {country.enabled ? "Desabilitar" : "Habilitar"}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(country)} // New delete button
+                      className="px-2 md:px-4 py-1 md:py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs md:text-sm ml-2"
+                    >
+                      Eliminar
                     </button>
                   </td>
                 </tr>
@@ -326,7 +381,7 @@ const AdminPanel = () => {
               className="bg-white p-6 rounded-lg w-96"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2>¿Estás seguro de eliminar este país?</h2>
+              <h2>¿Estás seguro de deshabilitar este país?</h2>
               <p>{countryToDelete?.name}</p>
               <div className="flex justify-between mt-4">
                 <button
@@ -337,6 +392,35 @@ const AdminPanel = () => {
                 </button>
                 <button
                   onClick={() => setShowDisableModal(false)}
+                  className="bg-gray-300 px-4 py-2 rounded"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showDeleteModal && ( // New delete modal
+          <div
+            className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <div
+              className="bg-white p-6 rounded-lg w-96"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2>¿Estás seguro de eliminar este país?</h2>
+              <p>{countryToDelete?.name}</p>
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={handleDeleteCountry}
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Confirmar
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
                   className="bg-gray-300 px-4 py-2 rounded"
                 >
                   Cancelar

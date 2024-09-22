@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Calculadora from "./Calculadora";
 import CommentForm from "./CommentForm";
-import InfoPais from "./InfoPais";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
@@ -172,7 +171,7 @@ function Home() {
               </div>
             )}
 
-            <div className="my-8 bg-white shadow-md rounded-lg p-4 md:p-6 max-w-[37.3rem]">
+            <div className="my-8 bg-white shadow-md rounded-lg p-4 md:p-6 max-w-3xl">
               <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-4">
                 Comentarios de usuarios
               </h3>
@@ -224,23 +223,79 @@ function Home() {
         </div>
         <div className="shadow-lg p-4 md:p-6 rounded-lg bg-white w-full md:w-[80%] max-w-3xl">
           <h2 className="text-lg md:text-xl font-bold mb-4 text-blue-500 text-center">
-            Lista de Precios
+            Equivalencias en Dolares
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-            {data.map((country) => (
-              <div
-                key={country._id}
-                className="border-b border-gray-200 pb-3 md:pb-4 flex justify-center"
-              >
-                <InfoPais data={country} />
-              </div>
-            ))}
-          </div>
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-h-[700px] overflow-y-auto">
+            <table className="w-full text-sm text-left text-gray-500 hidden md:table">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-2 py-3 text-center">
+                    Pais
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    Moneda
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center">
+                    Precio
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {data.map((country) => (
+                  <tr
+                    key={country._id}
+                    className="odd:bg-white even:bg-gray-50 border-b border-gray-200"
+                  >
+                    <td className="px-2 py-4 whitespace-nowrap">
+                      <div className="flex justify-center font-bold">
+                        {country.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center justify-center md:justify-start font-bold">
+                        <img
+                          src={country.flag}
+                          alt={`${country.name} flag`}
+                          className="w-6 h-4 mr-2"
+                        />
+                        {country.currency}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex justify-center font-bold">
+                        {country.usd_price}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-          <span className="text-xs md:text-sm text-gray-400 block mt-4">
-            El valor de cada moneda equivale a 1 USD
-          </span>
+            <div className="md:hidden">
+              {data.map((country) => (
+                <div
+                  key={country._id}
+                  className="bg-white border-b border-gray-200 p-4"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-bold text-gray-700">
+                      {country.name}
+                    </span>
+                    <span className="text-gray-500">{country.usd_price}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <img
+                      src={country.flag}
+                      alt={`${country.name} flag`}
+                      className="w-6 h-4 mr-2"
+                    />
+                    <span className="text-gray-500">{country.currency}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </>

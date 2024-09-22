@@ -217,6 +217,16 @@ app.delete("/api/deleteComments", async (req, res) => {
   }
 });
 
+app.delete("/api/deleteCountry/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Countries.findByIdAndDelete(id);
+    res.status(200).json({ message: "País eliminado exitosamente" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 if (process.env.NODE_ENV !== "production") {
   app.listen(port, () => {
     console.log(`API server running on port ${port}`);
