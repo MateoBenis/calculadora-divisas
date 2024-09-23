@@ -2,16 +2,18 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Select from "react-select";
 
-function Calculadora({ data }) {
+function Calculadora({ data, isAuthenticated }) {
   const [montoIzq, setMontoIzq] = useState("");
   const [montoDer, setMontoDer] = useState("");
   const [currencyIzq, setCurrencyIzq] = useState("ARS");
   const [currencyDer, setCurrencyDer] = useState("BRL");
   const [lastUpdated, setLastUpdated] = useState("izq");
+  const [montoUSD, setMontoUSD] = useState(0);
 
   function calcular(monto, usdpriceIzq, usdpriceDer, direction) {
     if (direction === "izq") {
       let montoUSD = monto / usdpriceIzq;
+      setMontoUSD(montoUSD);
       let montoConvertido = montoUSD * usdpriceDer;
       return montoConvertido * 0.8;
     } else {
@@ -97,8 +99,17 @@ function Calculadora({ data }) {
   return (
     <div className="">
       <form className="max-w-full mx-auto flex flex-col md:flex-row gap-3">
-        <div className="flex justify-center items-center w-full md:w-auto">
+        <div
+          className={`flex justify-center items-center w-full md:w-auto ${
+            isAuthenticated && "mb-5"
+          }`}
+        >
           <div className="relative w-full">
+            {isAuthenticated && ( // Conditional rendering for montoUSD
+              <div className="block text-sm font-medium text-gray-700">
+                Monto USD: {montoUSD.toFixed(2)}
+              </div>
+            )}
             <label
               htmlFor="currency-input-izq"
               className="block text-sm font-medium text-gray-700"
@@ -243,6 +254,7 @@ Calculadora.propTypes = {
         .isRequired,
     })
   ).isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
 };
 
 export default Calculadora;
