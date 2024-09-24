@@ -96,6 +96,12 @@ function Calculadora({ data, isAuthenticated }) {
     }),
   };
 
+  function handleSwap() {
+    const tempCurrency = currencyIzq;
+    setCurrencyIzq(currencyDer);
+    setCurrencyDer(tempCurrency);
+  }
+
   return (
     <div className="">
       <form className="max-w-full mx-auto flex flex-col md:flex-row gap-3">
@@ -160,7 +166,7 @@ function Calculadora({ data, isAuthenticated }) {
           </div>
         </div>
 
-        <div className="flex justify-center items-center my-2 md:mt-6">
+        <div className="flex justify-center items-center my-2 md:mt-7">
           <svg
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +177,9 @@ function Calculadora({ data, isAuthenticated }) {
             strokeLinejoin="miter"
             fill="none"
             color="#000000"
-            width={20}
+            width={40}
+            onClick={handleSwap}
+            className="cursor-pointer shadow bg-white p-2 rounded"
           >
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g
