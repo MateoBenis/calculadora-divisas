@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import Select from "react-select";
 
@@ -10,7 +10,7 @@ function Calculadora({ data, isAuthenticated }) {
   const [lastUpdated, setLastUpdated] = useState("izq");
   const [montoUSD, setMontoUSD] = useState(0);
 
-  function calcular(monto, usdpriceIzq, usdpriceDer, direction) {
+  const calcular = useCallback((monto, usdpriceIzq, usdpriceDer, direction) => {
     if (direction === "izq") {
       let montoUSD = monto / usdpriceIzq;
       setMontoUSD(montoUSD);
@@ -21,7 +21,7 @@ function Calculadora({ data, isAuthenticated }) {
       let montoConvertido = Y * usdpriceIzq;
       return montoConvertido * 1.25;
     }
-  }
+  }, []);
 
   useEffect(() => {
     const obtenerPrecioPorCurrency = (currency) => {
@@ -49,17 +49,25 @@ function Calculadora({ data, isAuthenticated }) {
       );
       setMontoIzq(montoConvertido.toFixed(2));
     }
-  }, [montoIzq, montoDer, currencyIzq, currencyDer, data, lastUpdated]);
+  }, [
+    montoIzq,
+    montoDer,
+    currencyIzq,
+    currencyDer,
+    data,
+    lastUpdated,
+    calcular,
+  ]);
 
-  function handleMontoIzq(e) {
+  const handleMontoIzq = useCallback((e) => {
     setMontoIzq(e.target.value);
     setLastUpdated("izq");
-  }
+  }, []);
 
-  function handleMontoDer(e) {
+  const handleMontoDer = useCallback((e) => {
     setMontoDer(e.target.value);
     setLastUpdated("der");
-  }
+  }, []);
 
   const options = data.map((country) => ({
     value: country.currency,
@@ -96,11 +104,11 @@ function Calculadora({ data, isAuthenticated }) {
     }),
   };
 
-  function handleSwap() {
+  const handleSwap = useCallback(() => {
     const tempCurrency = currencyIzq;
     setCurrencyIzq(currencyDer);
     setCurrencyDer(tempCurrency);
-  }
+  }, [currencyIzq, currencyDer]);
 
   return (
     <div className="">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Calculadora from "./Calculadora";
 import CommentForm from "./CommentForm";
@@ -13,13 +13,13 @@ function Home() {
   const [tempVisibleComments, setTempVisibleComments] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
-  const toggleCommentVisibility = (commentId) => {
+  const toggleCommentVisibility = useCallback((commentId) => {
     setTempVisibleComments((prev) =>
       prev.includes(commentId)
         ? prev.filter((id) => id !== commentId)
         : [...prev, commentId]
     );
-  };
+  }, []);
 
   const saveVisibleComments = async () => {
     try {
@@ -39,7 +39,7 @@ function Home() {
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
+  const handleDeleteComment = useCallback(async (commentId) => {
     try {
       await axios.delete(
         "https://server-chi-lyart.vercel.app/api/deleteComments",
@@ -53,15 +53,11 @@ function Home() {
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    setIsAuthenticated(!!token);
 
     const fetchCountries = async () => {
       try {
@@ -360,7 +356,6 @@ function Home() {
             )}
 
             <CommentForm
-              comments={comments}
               setComments={setComments}
               isLoggedIn={isAuthenticated}
             />

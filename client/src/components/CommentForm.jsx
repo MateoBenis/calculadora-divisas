@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-const CommentForm = ({ comments, setComments, isLoggedIn }) => {
+const CommentForm = ({ setComments, isLoggedIn }) => {
   const [showModal, setShowModal] = useState(false);
   const [newComment, setNewComment] = useState({
     name: "",
@@ -12,21 +12,21 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
   const [nameCharsLeft, setNameCharsLeft] = useState(20);
   const [commentCharsLeft, setCommentCharsLeft] = useState(120);
 
-  const handleNameChange = (e) => {
+  const handleNameChange = useCallback((e) => {
     const name = e.target.value;
     if (name.length <= 20) {
-      setNewComment({ ...newComment, name });
+      setNewComment((prev) => ({ ...prev, name }));
       setNameCharsLeft(20 - name.length);
     }
-  };
+  }, []);
 
-  const handleCommentChange = (e) => {
+  const handleCommentChange = useCallback((e) => {
     const comment = e.target.value;
     if (comment.length <= 120) {
-      setNewComment({ ...newComment, comment });
+      setNewComment((prev) => ({ ...prev, comment }));
       setCommentCharsLeft(120 - comment.length);
     }
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,7 +56,7 @@ const CommentForm = ({ comments, setComments, isLoggedIn }) => {
         "https://server-chi-lyart.vercel.app/api/createComment",
         commentToSend
       );
-      setComments([...comments, response.data.comment]);
+      setComments((prev) => [...prev, response.data.comment]);
       setNewComment({ name: "", comment: "" });
       setShowModal(false);
       setError(""); // Clear error on successful submission
@@ -134,7 +134,7 @@ CommentForm.propTypes = {
     })
   ).isRequired,
   setComments: PropTypes.func.isRequired,
-  isLoggedIn: PropTypes.bool.isRequired, // Add prop type for isLoggedIn
+  isLoggedIn: PropTypes.bool.isRequired,
 };
 
 export default CommentForm;

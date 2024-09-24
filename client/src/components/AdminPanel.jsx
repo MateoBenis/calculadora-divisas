@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -9,7 +9,7 @@ const AdminPanel = () => {
   const [changes, setChanges] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showDisableModal, setShowDisableModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // New state for delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [countryToDelete, setCountryToDelete] = useState(null);
   const [newCountry, setNewCountry] = useState({
     name: "",
@@ -17,7 +17,7 @@ const AdminPanel = () => {
     currency: "",
     usd_price: 0,
   });
-  const [successMessage, setSuccessMessage] = useState(""); // New state for success message
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -30,34 +30,40 @@ const AdminPanel = () => {
   }, []);
 
   useEffect(() => {
-    axios
-      .get("https://server-chi-lyart.vercel.app/api/getCountries")
-      .then((response) => {
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(
+          "https://server-chi-lyart.vercel.app/api/getCountries"
+        );
         const sortedCountries = response.data.sort((a, b) =>
           a.name.localeCompare(b.name)
         );
         setCountries(sortedCountries);
-      })
-      .catch((error) => console.error("Error fetching countries:", error));
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    };
+    fetchCountries();
   }, []);
 
-  const handleInputChange = (id, field, value) => {
-    const updatedCountries = countries.map((country) =>
-      country._id === id ? { ...country, [field]: value } : country
+  const handleInputChange = useCallback((id, field, value) => {
+    setCountries((prevCountries) =>
+      prevCountries.map((country) =>
+        country._id === id ? { ...country, [field]: value } : country
+      )
     );
-    setCountries(updatedCountries);
 
-    const existingChange = changes.find((change) => change._id === id);
-    if (existingChange) {
-      setChanges(
-        changes.map((change) =>
+    setChanges((prevChanges) => {
+      const existingChange = prevChanges.find((change) => change._id === id);
+      if (existingChange) {
+        return prevChanges.map((change) =>
           change._id === id ? { ...change, [field]: value } : change
-        )
-      );
-    } else {
-      setChanges([...changes, { _id: id, [field]: value }]);
-    }
-  };
+        );
+      } else {
+        return [...prevChanges, { _id: id, [field]: value }];
+      }
+    });
+  }, []);
 
   const handleSaveChanges = async () => {
     try {
@@ -65,20 +71,18 @@ const AdminPanel = () => {
         "https://server-chi-lyart.vercel.app/api/updateCountries",
         changes
       );
-      setSuccessMessage("Cambios guardados con éxito."); // Set success message
-      setTimeout(() => {
-        setSuccessMessage(""); // Clear message after 3 seconds
-      }, 3000);
-      setChanges([]); // Clear changes after saving
+      setSuccessMessage("Cambios guardados con éxito.");
+      setTimeout(() => setSuccessMessage(""), 3000);
+      setChanges([]);
     } catch (error) {
       console.error("Error saving changes:", error);
     }
   };
 
-  const handleDisableClick = (country) => {
+  const handleDisableClick = useCallback((country) => {
     setCountryToDelete(country);
     setShowDisableModal(true);
-  };
+  }, []);
 
   const handleToggleCountry = async () => {
     if (!countryToDelete._id) {
@@ -91,13 +95,11 @@ const AdminPanel = () => {
       await axios.put(
         `https://server-chi-lyart.vercel.app/api/${action}Country/${countryToDelete._id}`
       );
-
       setCountries((prevCountries) =>
         prevCountries.map((c) =>
           c._id === countryToDelete._id ? { ...c, enabled: !c.enabled } : c
         )
       );
-
       setShowDisableModal(false);
     } catch (error) {
       console.error(`Error country:`, error);
@@ -121,10 +123,10 @@ const AdminPanel = () => {
     }
   };
 
-  const handleDeleteClick = (country) => {
+  const handleDeleteClick = useCallback((country) => {
     setCountryToDelete(country);
     setShowDeleteModal(true);
-  };
+  }, []);
 
   const handleDeleteCountry = async () => {
     if (!countryToDelete._id) {
@@ -136,11 +138,9 @@ const AdminPanel = () => {
       await axios.delete(
         `https://server-chi-lyart.vercel.app/api/deleteCountry/${countryToDelete._id}`
       );
-
       setCountries((prevCountries) =>
         prevCountries.filter((c) => c._id !== countryToDelete._id)
       );
-
       setShowDeleteModal(false);
     } catch (error) {
       console.error(`Error deleting country:`, error);
