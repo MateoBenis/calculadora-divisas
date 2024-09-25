@@ -397,7 +397,7 @@ function Home() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center justify-center md:justify-start font-bold">
                           <img
-                            src={country.flag}
+                            src={`data:image/png;base64,${country.flag}`}
                             alt={`${country.name} flag`}
                             className="w-6 h-4 mr-2"
                           />
@@ -430,7 +430,7 @@ function Home() {
                     </div>
                     <div className="flex items-center">
                       <img
-                        src={country.flag}
+                        src={`data:image/png;base64,${country.flag}`}
                         alt={`${country.name} flag`}
                         className="w-6 h-4 mr-2"
                       />
