@@ -74,7 +74,7 @@ function Calculadora({ data, isAuthenticated }) {
     label: (
       <div className="flex items-center">
         <img
-          src={country.flag}
+          src={`data:image/png;base64,${country.flag}`}
           alt={`${country.name} flag`}
           className="w-6 h-4 mr-2"
         />
