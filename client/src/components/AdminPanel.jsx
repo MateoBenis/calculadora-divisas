@@ -154,6 +154,27 @@ const AdminPanel = () => {
     navigate("/login");
   };
 
+  const handleFileChange = useCallback(
+    (id, file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result.split(",")[1]; // Extract base64 part
+        handleInputChange(id, "flag", base64String);
+      };
+      reader.readAsDataURL(file);
+    },
+    [handleInputChange]
+  );
+
+  const handleNewCountryFileChange = (file) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result.split(",")[1]; // Extract base64 part
+      setNewCountry((prev) => ({ ...prev, flag: base64String }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   if (isAuthenticated === null || countries.length === 0) {
     return (
       <>
@@ -221,7 +242,7 @@ const AdminPanel = () => {
                   Nombre
                 </th>
                 <th className="px-2 md:px-4 py-2 md:py-3 text-left text-blue-700">
-                  Bandera (URL)
+                  Bandera
                 </th>
                 <th className="px-2 md:px-4 py-2 md:py-3 text-left text-blue-700">
                   Moneda
@@ -253,16 +274,26 @@ const AdminPanel = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
                     />
                   </td>
-                  <td className="px-2 md:px-4 py-2 md:py-3">
-                    <input
-                      type="text"
-                      value={country.flag || ""}
-                      onChange={(e) =>
-                        handleInputChange(country._id, "flag", e.target.value)
-                      }
-                      disabled={!country.enabled}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-                    />
+                  <td className="px-2 md:px-4 py-2 md:py-3 flex flex-row items-center justify-center gap-2">
+                    {country.flag && (
+                      <img
+                        src={`data:image/png;base64,${country.flag}`}
+                        alt="flag"
+                        className="w-6 h-4 object-cover"
+                      />
+                    )}
+                    <label className="w-full px-3 py-2 border bg-blue-600 hover:bg-blue-500 duration-200 text-white font-medium border-gray-300 rounded-lg focus:ring focus:ring-blue-200 cursor-pointer">
+                      Cambiar
+                      <input
+                        type="file"
+                        accept="image/png, image/jpeg, image/jpg, image/webp"
+                        onChange={(e) =>
+                          handleFileChange(country._id, e.target.files[0])
+                        }
+                        disabled={!country.enabled}
+                        className="hidden"
+                      />
+                    </label>
                   </td>
                   <td className="px-2 md:px-4 py-2 md:py-3">
                     <input
@@ -353,18 +384,34 @@ const AdminPanel = () => {
                 onChange={(e) =>
                   setNewCountry({ ...newCountry, name: e.target.value })
                 }
-                className="block w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
+                className="block w-full px-4 py-2 mb-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
               />
 
-              <input
-                type="text"
-                placeholder="Bandera (URL)"
-                value={newCountry.flag}
-                onChange={(e) =>
-                  setNewCountry({ ...newCountry, flag: e.target.value })
-                }
-                className="block w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200"
-              />
+              <div
+                className={`flex mb-2 ${
+                  newCountry.flag &&
+                  "items-center justify-end gap-2 flex-row-reverse"
+                }`}
+              >
+                <label className=" px-4 py-2 border bg-blue-600 hover:bg-blue-500 duration-200 text-white font-medium border-gray-300 rounded-lg focus:ring focus:ring-blue-200 cursor-pointer">
+                  Seleccionar
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                    onChange={(e) =>
+                      handleNewCountryFileChange(e.target.files[0])
+                    }
+                    className="hidden"
+                  />
+                </label>
+                {newCountry.flag && (
+                  <img
+                    src={`data:image/png;base64,${newCountry.flag}`}
+                    alt="flag"
+                    className="w-16 h-10 object-cover"
+                  />
+                )}
+              </div>
 
               <input
                 type="text"
